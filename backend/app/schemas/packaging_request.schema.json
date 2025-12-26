@@ -1,0 +1,222 @@
+{
+  "$defs": {
+    "Characteristic": {
+      "additionalProperties": false,
+      "properties": {
+        "k": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "K",
+          "type": "string"
+        },
+        "v": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "V",
+          "type": "string"
+        }
+      },
+      "required": [
+        "k",
+        "v"
+      ],
+      "title": "Characteristic",
+      "type": "object"
+    },
+    "Marketplace": {
+      "enum": [
+        "WB",
+        "OZON",
+        "AVITO",
+        "OTHER"
+      ],
+      "title": "Marketplace",
+      "type": "string"
+    },
+    "OutputOptions": {
+      "additionalProperties": false,
+      "description": "Controls the shape/size of the generated result.",
+      "properties": {
+        "title_variants": {
+          "default": 5,
+          "maximum": 15,
+          "minimum": 1,
+          "title": "Title Variants",
+          "type": "integer"
+        },
+        "bullets_count": {
+          "default": 6,
+          "maximum": 15,
+          "minimum": 0,
+          "title": "Bullets Count",
+          "type": "integer"
+        },
+        "need_short_description": {
+          "default": true,
+          "title": "Need Short Description",
+          "type": "boolean"
+        },
+        "need_long_description": {
+          "default": true,
+          "title": "Need Long Description",
+          "type": "boolean"
+        },
+        "need_seo": {
+          "default": true,
+          "title": "Need Seo",
+          "type": "boolean"
+        },
+        "faq_count": {
+          "default": 10,
+          "maximum": 30,
+          "minimum": 0,
+          "title": "Faq Count",
+          "type": "integer"
+        },
+        "review_replies_per_sentiment": {
+          "default": 3,
+          "maximum": 10,
+          "minimum": 0,
+          "title": "Review Replies Per Sentiment",
+          "type": "integer"
+        }
+      },
+      "title": "OutputOptions",
+      "type": "object"
+    },
+    "Tone": {
+      "enum": [
+        "neutral",
+        "friendly",
+        "premium",
+        "strict"
+      ],
+      "title": "Tone",
+      "type": "string"
+    },
+    "Variant": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "maxLength": 80,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "value": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "value"
+      ],
+      "title": "Variant",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "marketplace": {
+      "$ref": "#/$defs/Marketplace"
+    },
+    "category": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Category",
+      "type": "string"
+    },
+    "product_name": {
+      "maxLength": 120,
+      "minLength": 1,
+      "title": "Product Name",
+      "type": "string"
+    },
+    "brand": {
+      "anyOf": [
+        {
+          "maxLength": 80,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Brand"
+    },
+    "characteristics": {
+      "items": {
+        "$ref": "#/$defs/Characteristic"
+      },
+      "maxItems": 60,
+      "title": "Characteristics",
+      "type": "array"
+    },
+    "variants": {
+      "items": {
+        "$ref": "#/$defs/Variant"
+      },
+      "maxItems": 30,
+      "title": "Variants",
+      "type": "array"
+    },
+    "audience": {
+      "maxLength": 240,
+      "minLength": 1,
+      "title": "Audience",
+      "type": "string"
+    },
+    "tone": {
+      "$ref": "#/$defs/Tone",
+      "default": "neutral"
+    },
+    "forbidden_words": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 80,
+      "title": "Forbidden Words",
+      "type": "array"
+    },
+    "forbidden_claims": {
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 40,
+      "title": "Forbidden Claims",
+      "type": "array"
+    },
+    "output_options": {
+      "$ref": "#/$defs/OutputOptions"
+    },
+    "language": {
+      "default": "ru",
+      "enum": [
+        "ru",
+        "en"
+      ],
+      "title": "Language",
+      "type": "string"
+    },
+    "installation_id": {
+      "description": "UUID from device (used for rate limiting & analytics)",
+      "maxLength": 64,
+      "minLength": 8,
+      "title": "Installation Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "marketplace",
+    "category",
+    "product_name",
+    "audience",
+    "installation_id"
+  ],
+  "title": "PackagingRequest",
+  "type": "object"
+}

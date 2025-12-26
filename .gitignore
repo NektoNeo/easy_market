@@ -1,0 +1,40 @@
+# ===== Dart / Flutter =====
+.dart_tool/
+.packages
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+coverage/
+
+# Flutter platform artefacts (if generated)
+android/.gradle/
+android/local.properties
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/ephemeral/
+
+# ===== IDE =====
+.idea/
+.vscode/
+*.iml
+
+# ===== macOS =====
+.DS_Store
+
+# ===== Python =====
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+*.egg-info/
+
+# ===== Env / secrets =====
+.env
+.env.*
+*.key
+*.pem
