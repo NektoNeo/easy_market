@@ -61,8 +61,14 @@ def _build_missing_questions(req: PackagingRequest) -> list[str]:
     category = _norm(req.category)
     # generic essentials
     if len(req.characteristics) == 0:
-        questions.append("Укажите 3–5 ключевых характеристик (материал, размер/объём, назначение).")
-        questions.append("Уточните, чем товар отличается от аналогов (1–2 факта, без рекламных обещаний).")
+        questions.append(
+            "Укажите 3–5 ключевых характеристик "
+            "(материал, размер/объём, назначение)."
+        )
+        questions.append(
+            "Уточните, чем товар отличается от аналогов "
+            "(1–2 факта, без рекламных обещаний)."
+        )
         return questions
 
     # category heuristics (simple, safe)
@@ -79,7 +85,10 @@ def _build_missing_questions(req: PackagingRequest) -> list[str]:
         if not _has_key(req, "тип кожи", "кожа"):
             questions.append("Для какого типа кожи/волос предназначено?")
         if not _has_key(req, "состав", "ингредиент"):
-            questions.append("Есть ли ключевые ингредиенты/активы, которые можно упомянуть без обещаний эффекта?")
+            questions.append(
+                "Есть ли ключевые ингредиенты/активы, "
+                "которые можно упомянуть без обещаний эффекта?"
+            )
     if any(w in category for w in ["кабель", "заряд", "электрон", "науш", "ламп", "гаджет"]):
         if not _has_key(req, "совмест", "поддерж", "интерфейс", "разъём", "usb", "type"):
             questions.append("С какими устройствами/интерфейсами совместим товар?")
@@ -129,7 +138,11 @@ def _build_titles(req: PackagingRequest, n: int) -> list[str]:
         else:
             # Reorder characteristics, still only from input
             values = _pick_char_values(req, limit=3)
-            extra = ", ".join(values[i % len(values) :] + values[: i % len(values)]) if values else ""
+            if values:
+                shift = i % len(values)
+                extra = ", ".join(values[shift:] + values[:shift])
+            else:
+                extra = ""
             if extra:
                 titles.append(prefix + f"{req.product_name.strip()}, {extra}")
             else:
@@ -155,7 +168,9 @@ def _build_bullets(req: PackagingRequest, n: int) -> list[str]:
 
 def _build_descriptions(req: PackagingRequest) -> tuple[str, str]:
     # Only use provided data + safe phrasing.
-    characteristics = "; ".join([f"{c.k.strip()}: {c.v.strip()}" for c in req.characteristics[:10]])
+    characteristics = "; ".join(
+        [f"{c.k.strip()}: {c.v.strip()}" for c in req.characteristics[:10]]
+    )
     short = f"{req.product_name.strip()} для категории «{req.category.strip()}». "
     if req.brand:
         short += f"Бренд: {req.brand.strip()}. "
@@ -166,7 +181,10 @@ def _build_descriptions(req: PackagingRequest) -> tuple[str, str]:
     long = short + "\n\n"
     long += "Кому подойдёт (по вашему описанию): " + req.audience.strip() + ".\n"
     if req.variants:
-        long += "Варианты: " + ", ".join([f"{v.name.strip()} — {v.value.strip()}" for v in req.variants[:10]]) + ".\n"
+        variant_items = [
+            f"{v.name.strip()} — {v.value.strip()}" for v in req.variants[:10]
+        ]
+        long += "Варианты: " + ", ".join(variant_items) + ".\n"
     long += "\nВажно: текст сформирован по введённым данным. Проверьте факты перед публикацией."
     return short.strip(), long.strip()
 
@@ -282,12 +300,21 @@ class MockLLMProvider(LLMProvider):
 
         compliance_notes = [
             "Проверьте факты перед публикацией (объём, состав, совместимость и т.д.).",
-            "Избегайте медицинских и гарантированных обещаний (“лечит”, “100%”, “гарантия результата”), если это не подтверждено и не разрешено правилами площадки.",
+            (
+                "Избегайте медицинских и гарантированных обещаний (“лечит”, “100%”, "
+                "“гарантия результата”), если это не подтверждено и не разрешено "
+                "правилами площадки."
+            ),
             "Не используйте сравнения “лучший/№1” без доказательств.",
         ]
 
         return PackagingResponse(
-            meta=Meta(request_id=req_id, provider=self.name, model=self.model, latency_ms=latency_ms),
+            meta=Meta(
+                request_id=req_id,
+                provider=self.name,
+                model=self.model,
+                latency_ms=latency_ms,
+            ),
             missing_info_questions=missing,
             risk_flags=[],
             outputs=outputs,

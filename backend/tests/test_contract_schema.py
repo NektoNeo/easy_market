@@ -1,8 +1,7 @@
-
 import json
 
-import pytest
 import httpx
+import pytest
 from jsonschema import Draft202012Validator
 
 from app.main import app
@@ -35,7 +34,7 @@ async def test_contract_response_matches_json_schema():
     }
 
     schema_path = "app/schemas/packaging_response.schema.json"
-    with open(schema_path, "r", encoding="utf-8") as f:
+    with open(schema_path, encoding="utf-8") as f:
         schema = json.load(f)
 
     validator = Draft202012Validator(schema)

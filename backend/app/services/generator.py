@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import re
@@ -16,10 +15,26 @@ class RiskRule:
 
 
 RISK_RULES: list[RiskRule] = [
-    RiskRule("MEDICAL_CLAIM", RiskSeverity.high, re.compile(r"\bлеч(ит|ат|ить|ение)\b", re.I)),
-    RiskRule("GUARANTEE", RiskSeverity.high, re.compile(r"\b(100%|гарант(ир|ия|ируем))\b", re.I)),
-    RiskRule("SUPERLATIVE", RiskSeverity.medium, re.compile(r"\b(лучший|№\s*1|самый)\b", re.I)),
-    RiskRule("CERTIFICATION", RiskSeverity.medium, re.compile(r"\b(сертифицир|gost|гост|роскачество)\b", re.I)),
+    RiskRule(
+        "MEDICAL_CLAIM",
+        RiskSeverity.high,
+        re.compile(r"\bлеч(ит|ат|ить|ение)\b", re.I),
+    ),
+    RiskRule(
+        "GUARANTEE",
+        RiskSeverity.high,
+        re.compile(r"\b(100%|гарант(ир|ия|ируем))\b", re.I),
+    ),
+    RiskRule(
+        "SUPERLATIVE",
+        RiskSeverity.medium,
+        re.compile(r"\b(лучший|№\s*1|самый)\b", re.I),
+    ),
+    RiskRule(
+        "CERTIFICATION",
+        RiskSeverity.medium,
+        re.compile(r"\b(сертифицир|gost|гост|роскачество)\b", re.I),
+    ),
 ]
 
 
@@ -85,8 +100,14 @@ def build_prompt(req: PackagingRequest) -> str:
     - easier to test and evolve centrally
     """
     forbidden_words = ", ".join(req.forbidden_words) if req.forbidden_words else "—"
-    characteristics = "\n".join([f"- {c.k}: {c.v}" for c in req.characteristics]) or "- (нет данных)"
-    variants = "\n".join([f"- {v.name}: {v.value}" for v in req.variants]) or "- (нет вариантов)"
+    characteristics = (
+        "\n".join([f"- {c.k}: {c.v}" for c in req.characteristics])
+        or "- (нет данных)"
+    )
+    variants = (
+        "\n".join([f"- {v.name}: {v.value}" for v in req.variants])
+        or "- (нет вариантов)"
+    )
 
     return f"""
 Ты — ассистент для упаковки карточки товара для маркетплейса.
@@ -94,7 +115,8 @@ def build_prompt(req: PackagingRequest) -> str:
 1) НИКОГДА не выдумывай факты о товаре. Используй только входные данные.
 2) Если данных не хватает — верни список вопросов в missing_info_questions.
 3) Верни строго JSON по схеме PackagingResponse. Без markdown, без комментариев.
-4) Избегай рискованных обещаний (“лечит”, “100%”, “гарантия результата”, “лучший/№1”), если это не подтверждено.
+4) Избегай рискованных обещаний (“лечит”, “100%”, “гарантия результата”,
+“лучший/№1”), если это не подтверждено.
 
 ВХОД:
 marketplace: {req.marketplace}
@@ -132,6 +154,9 @@ async def generate(req: PackagingRequest, provider) -> PackagingResponse:
     flags = detect_risks(req, resp)
     notes = list(resp.compliance_notes or [])
     if flags:
-        notes.insert(0, "Обнаружены потенциально рискованные формулировки — проверьте перед публикацией.")
+        notes.insert(
+            0,
+            "Обнаружены потенциально рискованные формулировки — проверьте перед публикацией.",
+        )
 
     return resp.model_copy(update={"risk_flags": flags, "compliance_notes": notes})

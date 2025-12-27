@@ -1,15 +1,21 @@
-
 from __future__ import annotations
 
 import time
 from collections import defaultdict, deque
-from typing import Deque
+from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.models import PackagingRequest, PackagingResponse, SeedTemplate, TemplateDefaults, TemplatesResponse
+from app.models import (
+    PackagingRequest,
+    PackagingResponse,
+    SeedTemplate,
+    TemplateDefaults,
+    TemplatesResponse,
+)
+from app.providers.base import LLMProvider
 from app.providers.gigachat import GigaChatProvider
 from app.providers.mock import MockLLMProvider
 from app.providers.yandex import YandexProvider
@@ -25,7 +31,7 @@ class RateLimiter:
 
     def __init__(self, limit_per_minute: int):
         self.limit = limit_per_minute
-        self._events: dict[str, Deque[float]] = defaultdict(deque)
+        self._events: defaultdict[str, deque[float]] = defaultdict(deque)
 
     def check(self, key: str) -> None:
         now = time.time()
@@ -36,7 +42,10 @@ class RateLimiter:
         if len(q) >= self.limit:
             raise HTTPException(
                 status_code=429,
-                detail=f"Rate limit exceeded. Try again later. limit_per_minute={self.limit}",
+                detail=(
+                    "Rate limit exceeded. Try again later. "
+                    f"limit_per_minute={self.limit}"
+                ),
             )
         q.append(now)
 
@@ -44,7 +53,7 @@ class RateLimiter:
 rate_limiter = RateLimiter(limit_per_minute=settings.rate_limit_per_minute)
 
 
-def get_provider():
+def get_provider() -> LLMProvider:
     if settings.provider == "mock":
         return MockLLMProvider()
     if settings.provider == "yandex":
@@ -103,7 +112,10 @@ async def templates() -> TemplatesResponse:
 
 
 @app.post("/v1/generate/packaging", response_model=PackagingResponse)
-async def generate_packaging(req: PackagingRequest, provider=Depends(get_provider)) -> PackagingResponse:
+async def generate_packaging(
+    req: PackagingRequest,
+    provider: Annotated[LLMProvider, Depends(get_provider)],
+) -> PackagingResponse:
     rate_limiter.check(req.installation_id)
     try:
         return await generate(req, provider)
