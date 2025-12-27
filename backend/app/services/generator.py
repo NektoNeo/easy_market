@@ -101,13 +101,9 @@ def build_prompt(req: PackagingRequest) -> str:
     """
     forbidden_words = ", ".join(req.forbidden_words) if req.forbidden_words else "—"
     characteristics = (
-        "\n".join([f"- {c.k}: {c.v}" for c in req.characteristics])
-        or "- (нет данных)"
+        "\n".join([f"- {c.k}: {c.v}" for c in req.characteristics]) or "- (нет данных)"
     )
-    variants = (
-        "\n".join([f"- {v.name}: {v.value}" for v in req.variants])
-        or "- (нет вариантов)"
-    )
+    variants = "\n".join([f"- {v.name}: {v.value}" for v in req.variants]) or "- (нет вариантов)"
 
     return f"""
 Ты — ассистент для упаковки карточки товара для маркетплейса.

@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -15,6 +14,4 @@ class Settings(BaseSettings):
     gigachat_token: str | None = None
 
 
-settings = Settings(
-    provider=(__import__("os").environ.get("PACKAGER_PROVIDER") or "mock").lower()
-)
+settings = Settings(provider=(__import__("os").environ.get("PACKAGER_PROVIDER") or "mock").lower())

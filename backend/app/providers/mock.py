@@ -1,4 +1,3 @@
-
 from __future__ import annotations
 
 import hashlib
@@ -62,12 +61,10 @@ def _build_missing_questions(req: PackagingRequest) -> list[str]:
     # generic essentials
     if len(req.characteristics) == 0:
         questions.append(
-            "Укажите 3–5 ключевых характеристик "
-            "(материал, размер/объём, назначение)."
+            "Укажите 3–5 ключевых характеристик " "(материал, размер/объём, назначение)."
         )
         questions.append(
-            "Уточните, чем товар отличается от аналогов "
-            "(1–2 факта, без рекламных обещаний)."
+            "Уточните, чем товар отличается от аналогов " "(1–2 факта, без рекламных обещаний)."
         )
         return questions
 
@@ -168,9 +165,7 @@ def _build_bullets(req: PackagingRequest, n: int) -> list[str]:
 
 def _build_descriptions(req: PackagingRequest) -> tuple[str, str]:
     # Only use provided data + safe phrasing.
-    characteristics = "; ".join(
-        [f"{c.k.strip()}: {c.v.strip()}" for c in req.characteristics[:10]]
-    )
+    characteristics = "; ".join([f"{c.k.strip()}: {c.v.strip()}" for c in req.characteristics[:10]])
     short = f"{req.product_name.strip()} для категории «{req.category.strip()}». "
     if req.brand:
         short += f"Бренд: {req.brand.strip()}. "
@@ -181,9 +176,7 @@ def _build_descriptions(req: PackagingRequest) -> tuple[str, str]:
     long = short + "\n\n"
     long += "Кому подойдёт (по вашему описанию): " + req.audience.strip() + ".\n"
     if req.variants:
-        variant_items = [
-            f"{v.name.strip()} — {v.value.strip()}" for v in req.variants[:10]
-        ]
+        variant_items = [f"{v.name.strip()} — {v.value.strip()}" for v in req.variants[:10]]
         long += "Варианты: " + ", ".join(variant_items) + ".\n"
     long += "\nВажно: текст сформирован по введённым данным. Проверьте факты перед публикацией."
     return short.strip(), long.strip()

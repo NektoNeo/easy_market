@@ -42,10 +42,7 @@ class RateLimiter:
         if len(q) >= self.limit:
             raise HTTPException(
                 status_code=429,
-                detail=(
-                    "Rate limit exceeded. Try again later. "
-                    f"limit_per_minute={self.limit}"
-                ),
+                detail=("Rate limit exceeded. Try again later. " f"limit_per_minute={self.limit}"),
             )
         q.append(now)
 
